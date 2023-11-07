@@ -1,11 +1,5 @@
 #pragma once
-
-static const size_t BOOK_TEXT_FILD_SIZE = 100;
-
-static const int BOOK_STRUCT_FIELD_AMOUNT = 5;
-
-static const char* categoryTitles[5] = { "Educational", "Popular-Scientific", "Scientific", "Reference", "Artistic" };
-
+#include <iostream>
 static enum Category
 {
 	Educational,
@@ -17,12 +11,28 @@ static enum Category
 
 struct Book
 {
+	int _id;
 	char* author;
 	char* title;
 	unsigned short year;
 	float price;
 	Category category;
 };
+static void SetAuthor(Book* book, char* string) { strcpy(book->author, string); }
+static void SetTitle(Book* book, char* string) { strcpy(book->title, string); }
+static void SetYear(Book* book, char* string) { book->year = atoi(string); }
+static void SetPrice(Book* book, char* string) { book->price = atof(string); }
+static void SetCategory(Book* book, char* string) { book->category = (Category)atoi(string); }
+
+static const size_t BOOK_TEXT_FILD_SIZE = 100;
+
+static const int BOOK_STRUCT_FIELD_AMOUNT = 5;
+
+static const char* categoryTitles[5] = { "Educational", "Popular-Scientific", "Scientific", "Reference", "Artistic" };
+
+static void(*INPUT_FUNCTION_STACK[])(Book*, char*) = { SetAuthor, SetTitle, SetYear, SetPrice, SetCategory };
+
+
 
 static void SetBook(Book* book)
 {
@@ -37,8 +47,4 @@ static void DeleteBook(Book* book)
 	delete book;
 }
 
-// 4.
-void DisplayBook(Book*);
-
-// 5.
 bool SetBookData(Book*);

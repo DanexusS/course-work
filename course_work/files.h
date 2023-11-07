@@ -1,6 +1,6 @@
 #pragma once
 #include "book.h"
-#include "input_output.h"
+
 
 struct Files
 {
@@ -8,9 +8,10 @@ struct Files
 	size_t size;
 };
 
-static void GetFilesData(Files* files)
+static void SetFiles(Files* files, int size)
 {
-	
+	files->books = new Book[size];
+	files->size = 0;
 }
 
 static void DeleteFiles(Files* files)
@@ -20,3 +21,6 @@ static void DeleteFiles(Files* files)
 }
 
 void AddBook(Files*, Book*);
+void RemoveBook(Files*, int);
+
+void WorkWithFiles();
