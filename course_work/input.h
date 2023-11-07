@@ -16,8 +16,6 @@ static void get_files_data(Files* files)
 	FILE* files_data = fopen("data/files_data.txt", "r");
 	char buffer[1000];
 	char* book_location = buffer;
-	char* data_location = buffer;
-	strcpy(data_location, "data/");
 
 	printf("Gathering Files information from ./data folder.\n\n\n");
 
@@ -30,7 +28,7 @@ static void get_files_data(Files* files)
 		fscanf(files_data, "%[^\n]s\n", book_location);
 
 
-		printf(strcat(data_location, book_location));
+		
 
 
 		//printf("Opening ./data/%s and reading information", book_location);
