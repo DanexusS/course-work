@@ -135,7 +135,6 @@
     <ClInclude Include="book.h" />
     <ClInclude Include="files.h" />
     <ClInclude Include="input.h" />
-    <ClInclude Include="input_output.h" />
     <ClInclude Include="output.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
