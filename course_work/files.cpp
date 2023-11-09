@@ -28,7 +28,7 @@ void WorkWithFiles()
 		{
 			Book* book = new Book;
 
-			SetBook(book);
+			//SetBook(book);
 
 			if (SetBookData(book))
 			{
@@ -51,12 +51,19 @@ void WorkWithFiles()
 		{
 			ExportFilesData(files);
 		}
-		else if (input == PREDIFINED_FILES_COMMANDS.HELP_CHAR)
+		else if (strcmp(input, "5") == 0)
+		{
+			//display info
+			scan(input);
+			get_book_data(files, input);
+		}
+		else if (strcmp(input, PREDIFINED_FILES_COMMANDS.HELP_CHAR) == 0)
 		{
 			//print help func
 		}
-		else if (input == PREDIFINED_FILES_COMMANDS.EXIT_CHAR)
+		else if (strcmp(input, PREDIFINED_FILES_COMMANDS.EXIT_CHAR) == 0)
 		{
+			DeleteFiles(files);
 			return;
 		}
 
@@ -72,7 +79,7 @@ void RemoveBook(Files* files, int _id)
 	bool found = false;
 	for (; i < files->size; i++)
 	{
-		if (files->books[i]._id == _id)
+		if (files->books[i]->_id == _id)
 		{
 			found = true;
 			break;
@@ -84,7 +91,9 @@ void RemoveBook(Files* files, int _id)
 		return;
 	}
 
-	Book* newArray = new Book[files->size - 1];
+	Book** newArray = new Book*[files->size - 1];
+
+	DeleteBook(files->books[i]);
 
 	//int j = 0;
 	//while (j < files->size)
@@ -102,7 +111,7 @@ void RemoveBook(Files* files, int _id)
 		if (i == old_array_id)
 			old_array_id++;
 
-		files->books[old_array_id]._id = j;
+		files->books[old_array_id]->_id = j;
 
 		newArray[j] = files->books[old_array_id];
 
@@ -132,11 +141,11 @@ void AddBook(Files* files, Book* book)
 	book->_id = files->size;
 
 
-	Book* newArray = new Book[files->size + 1];
+	Book** newArray = new Book*[files->size + 1];
 
 	for (int i = 0; i < files->size; i++)
 		newArray[i] = files->books[i];
-	newArray[files->size] = *book;
+	newArray[files->size] = book;
 
 	delete[] files->books;
 	files->books = newArray;

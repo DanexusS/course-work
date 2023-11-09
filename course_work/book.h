@@ -18,8 +18,16 @@ struct Book
 	float price;
 	Category category;
 };
-static void SetAuthor(Book* book, char* string) { strcpy(book->author, string); }
-static void SetTitle(Book* book, char* string) { strcpy(book->title, string); }
+static void SetAuthor(Book* book, char* string) 
+{
+	book->author = new char[strlen(string) + 1];
+	strcpy(book->author, string);
+}
+static void SetTitle(Book* book, char* string) 
+{
+	book->title = new char[strlen(string) + 1];
+	strcpy(book->title, string);
+}
 static void SetYear(Book* book, char* string) { book->year = atoi(string); }
 static void SetPrice(Book* book, char* string) { book->price = atof(string); }
 static void SetCategory(Book* book, char* string) { book->category = (Category)atoi(string); }
@@ -34,11 +42,11 @@ static void(*INPUT_FUNCTION_STACK[])(Book*, char*) = { SetAuthor, SetTitle, SetY
 
 
 
-static void SetBook(Book* book)
-{
-	book->author = new char[BOOK_TEXT_FILD_SIZE];
-	book->title = new char[BOOK_TEXT_FILD_SIZE];
-}
+//static void SetBook(Book* book)
+//{
+//	book->author = new char[BOOK_TEXT_FILD_SIZE];
+//	book->title = new char[BOOK_TEXT_FILD_SIZE];
+//}
 
 static void DeleteBook(Book* book)
 {

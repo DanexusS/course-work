@@ -21,7 +21,7 @@ static void DisplayFiles(Files* files)
 {
 	for (int i = 0; i < files->size; i++)
 	{
-		DisplayBook(&files->books[i]);
+		DisplayBook(files->books[i]);
 	}
 }
 
@@ -42,17 +42,30 @@ static void ExportBookData(Book* book)
 
 static void ExportFilesData(Files* files)
 {
+	FILE* files_data = fopen("data/files_data.txt", "w");
+
+	fprintf(files_data, "%d\n", files->size);
+
 	for (int i = 0; i < files->size; i++)
 	{
-		ExportBookData(&files->books[i]);
+		ExportBookData(files->books[i]);
+		
+		
+
+		fprintf(files_data, files->books[i]->title);
+		fprintf(files_data, ".txt\n");
+
+		
 	}
 	//refresh files_data.txt
+
+	fclose(files_data);
 }
 
-static void DeleteBook(Files* files, int _id)
-{
-
-}
+//static void DeleteBook(Files* files, int _id)
+//{
+//
+//}
 
 //
 //static void print(const char* message)
