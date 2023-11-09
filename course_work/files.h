@@ -27,5 +27,6 @@ static void DeleteFiles(Files* files)
 
 void AddBook(Files*, Book*);
 void RemoveBook(Files*, int);
+void RemoveBooks(Files*, int, int);
 
 void WorkWithFiles();

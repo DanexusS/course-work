@@ -9,6 +9,10 @@ static enum Category
 	Artistic
 };
 
+
+
+
+
 struct Book
 {
 	int _id;
@@ -40,7 +44,7 @@ static const char* categoryTitles[5] = { "Educational", "Popular-Scientific", "S
 
 static void(*INPUT_FUNCTION_STACK[])(Book*, char*) = { SetAuthor, SetTitle, SetYear, SetPrice, SetCategory };
 
-
+int CompareBooks(Book*, Book*);
 
 //static void SetBook(Book* book)
 //{
@@ -56,3 +60,14 @@ static void DeleteBook(Book* book)
 }
 
 bool SetBookData(Book*);
+
+
+
+
+
+int CompareByAuthor(Book*, Book*);
+int CompareByTitle(Book*, Book*);
+int CompareByYear(Book*, Book*);
+int CompareByPrice(Book*, Book*);
+int CompareByCategory(Book*, Book*);
+int CompareByAll(Book*, Book*);

@@ -22,7 +22,30 @@ void WorkWithFiles()
 		scan(input);
 		if (strcmp(input, "1") == 0)
 		{
-			DisplayFiles(files);
+			//choose mode
+			if (strcmp(input, "1") == 0)
+			{
+				DisplayFiles(files);
+			}
+			else if (strcmp(input, "2") == 0)
+			{
+				//print sort variants
+				//enter sort amount
+				//ids
+				//int (*display_comparison_function_stack[])(Book*, Book*);
+				scan(input);
+				
+				for (int i = 0; i < atoi(input); i++)
+				{
+					scan(input);
+					
+					
+
+				}
+
+
+			}
+
 		}
 		else if (strcmp(input, "2") == 0)
 		{
@@ -38,14 +61,30 @@ void WorkWithFiles()
 			else
 			{
 				//error msg
+				delete book;
 			}
 		}
 		else if (strcmp(input, "3") == 0)
 		{
 			//display files
-			//enter book #
+			//choose mode
 			scan(input);
-			RemoveBook(files, atoi(input));
+			if (strcmp(input, "1") == 0)
+			{
+				//enter book #
+				scan(input);
+				RemoveBook(files, atoi(input));
+			}
+			else if (strcmp(input, "2") == 0)
+			{
+				//enter min and max book id
+				char new_buffer[1000];
+				char* max = new_buffer;
+
+				scan(input);
+				scan(max);
+				RemoveBooks(files, atoi(input), atoi(max));
+			}
 		}
 		else if (strcmp(input, "4") == 0)
 		{
@@ -129,6 +168,14 @@ void RemoveBook(Files* files, int _id)
 	delete[] files->books;
 	files->books = newArray;
 	files->size--;
+}
+
+void RemoveBooks(Files* files, int min, int max)
+{
+	for (int i = min; i < max + 1; i++)
+	{
+		RemoveBook(files, i);
+	}
 }
 
 //Book FindBook(Files* files)

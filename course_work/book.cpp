@@ -5,6 +5,69 @@
 
 #include "generics.h"
 
+//NOTE: archive
+int (*COMPARISON_FUNCTION_STACK[])(Book*, Book*) = { CompareByAuthor, CompareByTitle, CompareByYear, CompareByPrice };
+
+int CompareByAuthor(Book* first, Book* second)
+{
+	return strcmp(first->author, second->author);
+}
+int CompareByTitle(Book* first, Book* second)
+{
+	return strcmp(first->title, second->title);
+}
+int CompareByYear(Book* first, Book* second)
+{
+	if (first->year > second->year)
+		return 1;
+	if (first->year < second->year)
+		return -1;
+	return 0;
+}
+int CompareByPrice(Book* first, Book* second)
+{
+	if (first->price > second->price)
+		return 1;
+	if (first->price < second->price)
+		return -1;
+	return 0;
+}
+int CompareByCategory(Book* first, Book* second)
+{
+	if (first->category > second->category)
+		return 1;
+	if (first->category < second->category)
+		return -1;
+	return 0;
+}
+//int CompareByAll(Book* first, Book* second)
+//{
+//	int authorCompareResult = CompareByAuthor(first, second);
+//	if (authorCompareResult != 0)
+//		return authorCompareResult;
+//	int titleCompareResult = CompareByTitle(first, second);
+//	if (titleCompareResult != 0)
+//		return titleCompareResult;
+//	int yearCompareResult = CompareByYear(first, second);
+//	if (yearCompareResult != 0)
+//		return yearCompareResult;
+//	int priceCompareResult = CompareByPrice(first, second);
+//	if (priceCompareResult != 0)
+//		return priceCompareResult;
+//	int categoryCompareResult = CompareByCategory(first, second);
+//	if (categoryCompareResult != 0)
+//		return categoryCompareResult;
+//	return 0;
+//}
+
+
+//int CompareBooks(int (*compare_func)(Book*, Book*), Book* first, Book* second)
+//{
+//	return compare_func(first, second);
+//}
+
+//int (*FIELD_COMPARE_FUNCTION_STACK[])(Book*, Book*) = {};
+
 bool CheckIsNumber(char* input)
 {
 	int i = 0;
