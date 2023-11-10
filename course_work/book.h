@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include "generics.h"
 static enum Category
 {
 	Educational,
@@ -8,6 +9,7 @@ static enum Category
 	Reference,
 	Artistic
 };
+
 
 
 
@@ -60,14 +62,15 @@ static void DeleteBook(Book* book)
 }
 
 bool SetBookData(Book*);
+int CompareByAuthor(Book*, Book*, int);
+int CompareByTitle(Book*, Book*, int);
+int CompareByYear(Book*, Book*, int);
+int CompareByPrice(Book*, Book*, int);
+int CompareByCategory(Book*, Book*, int);
+int CompareByMultiple(Book*, Book*, SortingData**, int);
+
+static int (*COMPARISON_FUNCTION_STACK[])(Book*, Book*, int) = { CompareByAuthor, CompareByTitle, CompareByYear, CompareByPrice, CompareByCategory };
 
 
 
-
-
-int CompareByAuthor(Book*, Book*);
-int CompareByTitle(Book*, Book*);
-int CompareByYear(Book*, Book*);
-int CompareByPrice(Book*, Book*);
-int CompareByCategory(Book*, Book*);
-int CompareByAll(Book*, Book*);
+//int CompareByAll(Book*, Book*, int);

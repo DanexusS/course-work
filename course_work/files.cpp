@@ -4,8 +4,128 @@
 #include "output.h"
 #include "generics.h"
 
+
+
+
+
+
+// TODO: IMPLEMENT BASE SETTINGS
+
+
 const PREDIFINED_COMMANDS PREDIFINED_FILES_COMMANDS;
 //const char* FILES_EXIT_CHAR = "`";
+
+
+
+Book** BookSort(Files* files, int (*Compare)(Book*, Book*, int), int order)
+{
+	Book** sorted_books = files->books;
+
+
+	for (int i = 0; i < files->size - 1; i++)
+	{
+		bool b = false;
+		for (int j = 0; j < files->size - i - 1; j++)
+		{
+			Book* curBook = sorted_books[j];
+			Book* nextBook = sorted_books[j + 1];
+			if ((*Compare)(curBook, nextBook, order) > 0)
+			{
+				
+				Book* temp = curBook;
+
+				sorted_books[j] = nextBook;
+				sorted_books[j + 1] = temp;
+
+				b = true;
+			}
+		}
+		if (!b)
+			break;
+	}
+
+
+
+
+
+	return sorted_books;
+}
+
+
+Book** BookSort(Files* files, int (*Compare)(Book*, Book*, SortingData**, int), SortingData** sortingData, int size)
+{
+	Book** sorted_books = files->books;
+
+
+	for (int i = 0; i < files->size - 1; i++)
+	{
+		bool b = false;
+		for (int j = 0; j < files->size - i - 1; j++)
+		{
+			Book* curBook = sorted_books[j];
+			Book* nextBook = sorted_books[j + 1];
+			if ((*Compare)(curBook, nextBook, sortingData, size) > 0)
+			{
+
+				Book* temp = curBook;
+
+				sorted_books[j] = nextBook;
+				sorted_books[j + 1] = temp;
+
+				b = true;
+			}
+		}
+		if (!b)
+			break;
+	}
+
+
+
+
+
+	return sorted_books;
+}
+
+//void BookSort(char* pcFirst, int size, void (*Swap)(void*, void*), int (*Compare)(void*, void*))
+//{
+//	for (int i = 0; i < size - 1; i++)
+//	{
+//		bool b = false;
+//		for (int j = 0; j < size - i - 1; j++)
+//		{
+//			char* pCurrent = pcFirst + j;
+//			char* pNext = pcFirst + j + 1;
+//
+//			//if ((*Compare)(pCurrent, pNext) > 0)
+//			//{
+//			//	(*Swap)(pCurrent, pNext);
+//			//	b = true;
+//			//}
+//		}
+//		if (!b)
+//			return;
+//	}
+//
+//
+//
+//	//int i;
+//	//for (int i = 1; i < nNumber; i++)
+//	//{
+//	//	for (int j = nNumber - 1; j >= i; j--)
+//	//	{
+//	//		char* pCurrent = pcFirst + j * size;
+//	//		char* pPrevious = pcFirst + (j - 1) * size;
+//	//		if ((*Compare)(pPrevious, pCurrent) > 0)
+//	//			(*Swap)(pPrevious, pCurrent);
+//	//	}
+//	//}
+//
+//}
+//void BookSort()
+//{
+//
+//}
+
 
 void WorkWithFiles()
 {
@@ -22,6 +142,7 @@ void WorkWithFiles()
 		scan(input);
 		if (strcmp(input, "1") == 0)
 		{
+			scan(input);
 			//choose mode
 			if (strcmp(input, "1") == 0)
 			{
@@ -29,21 +150,67 @@ void WorkWithFiles()
 			}
 			else if (strcmp(input, "2") == 0)
 			{
-				//print sort variants
-				//enter sort amount
-				//ids
-				//int (*display_comparison_function_stack[])(Book*, Book*);
+				// chose mode
+				 
 				scan(input);
-				
-				for (int i = 0; i < atoi(input); i++)
+				if (strcmp(input, "1") == 0)
 				{
+					// chose field to sort
+					
 					scan(input);
-					
-					
 
+					char new_buffer[1000];
+					char* max = new_buffer;
+					Book** sorted_books;
+
+					scan(max);
+					if (atoi(max) == 1)
+						sorted_books = BookSort(files, COMPARISON_FUNCTION_STACK[atoi(input)], -1);
+					else
+						sorted_books = BookSort(files, COMPARISON_FUNCTION_STACK[atoi(input)], 1);
+					DisplayBookList(sorted_books, files->size);
 				}
+				else if (strcmp(input, "2") == 0)
+				{
+
+					//print sort variants
+					//enter sort amount
+					//ids
+					//int (*display_comparison_function_stack[])(Book*, Book*);
 
 
+					printf("enter size\n");
+					scan(input);
+					int size = atoi(input);
+					SortingData** sorting_functions = new SortingData*[atoi(input)];
+					for (int i = 0; i < atoi(input); i++)
+					{
+						SortingData* sortingData = new SortingData;
+						
+						printf("enter type\n");
+						scan(input);
+
+						char new_buffer[1000];
+						char* max = new_buffer;
+
+
+						// ascend/descend order
+
+						printf("enter order\n");
+						scan(max);
+
+
+
+						//BookSort(input, 10, , )
+
+						SetSortingData(sortingData, atoi(input), atoi(max));
+
+						sorting_functions[i] = sortingData;
+					}
+
+					Book** sorted_books = BookSort(files, CompareByMultiple, sorting_functions, size);
+					DisplayBookList(sorted_books, files->size);
+				}
 			}
 
 		}

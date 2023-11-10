@@ -6,40 +6,54 @@
 #include "generics.h"
 
 //NOTE: archive
-int (*COMPARISON_FUNCTION_STACK[])(Book*, Book*) = { CompareByAuthor, CompareByTitle, CompareByYear, CompareByPrice };
 
-int CompareByAuthor(Book* first, Book* second)
+// TODO: use custom strcmp
+int CompareByAuthor(Book* first, Book* second, int order)
 {
-	return strcmp(first->author, second->author);
+	return strcmp(first->author, second->author) * order;
 }
-int CompareByTitle(Book* first, Book* second)
+int CompareByTitle(Book* first, Book* second, int order)
 {
-	return strcmp(first->title, second->title);
+	return strcmp(first->title, second->title) * order;
 }
-int CompareByYear(Book* first, Book* second)
+int CompareByYear(Book* first, Book* second, int order)
 {
 	if (first->year > second->year)
-		return 1;
+		return order;
 	if (first->year < second->year)
-		return -1;
+		return order;
 	return 0;
 }
-int CompareByPrice(Book* first, Book* second)
+int CompareByPrice(Book* first, Book* second, int order)
 {
 	if (first->price > second->price)
-		return 1;
+		return order;
 	if (first->price < second->price)
-		return -1;
+		return order;
 	return 0;
 }
-int CompareByCategory(Book* first, Book* second)
+int CompareByCategory(Book* first, Book* second, int order)
 {
 	if (first->category > second->category)
-		return 1;
+		return order;
 	if (first->category < second->category)
-		return -1;
+		return order;
 	return 0;
 }
+
+
+int CompareByMultiple(Book* first, Book* second, SortingData** sortingData, int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		int compareResult = COMPARISON_FUNCTION_STACK[sortingData[i]->field_id](first, second, sortingData[i]->order);
+		if (compareResult != 0)
+			return compareResult;
+	}
+	return 0;
+}
+
+
 //int CompareByAll(Book* first, Book* second)
 //{
 //	int authorCompareResult = CompareByAuthor(first, second);

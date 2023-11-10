@@ -17,12 +17,20 @@ static void DisplayBook(Book* book)
 	);
 }
 
+
+
+static void DisplayBookList(Book** books, int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		DisplayBook(books[i]);
+	}
+}
+
+
 static void DisplayFiles(Files* files)
 {
-	for (int i = 0; i < files->size; i++)
-	{
-		DisplayBook(files->books[i]);
-	}
+	DisplayBookList(files->books, files->size);
 }
 
 static void ExportBookData(Book* book)
