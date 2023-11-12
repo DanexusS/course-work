@@ -134,12 +134,12 @@
   <ItemGroup>
     <ClCompile Include="book.cpp" />
     <ClCompile Include="course_work.cpp" />
-    <ClCompile Include="files.cpp" />
+    <ClCompile Include="library.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="book.h" />
-    <ClInclude Include="files.h" />
     <ClInclude Include="generics.h" />
+    <ClInclude Include="library.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="output.h" />
   </ItemGroup>

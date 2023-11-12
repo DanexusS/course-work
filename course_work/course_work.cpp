@@ -8,17 +8,15 @@
 *************************************************************/
 
 #include <vld.h>
-#include "files.h"
+
 #include "book.h"
 #include "input.h"
 #include "output.h"
-
-#define	  stop __asm nop	
+#include "library.h"
 
 void main()
 {
-	WorkWithFiles();
-
+	WorkWithLibrary();
 
 	//Используйте структуру BOOK, созданную в предыдущей работе.
 	//Для этого достаточно переписать и подключить к проекту файлы
@@ -28,16 +26,6 @@ void main()
 	//«Картотека» - это массив структур => нужно такой массив создать.
 	//Замечание: размер массива придется увеличиватьпо мере добавления книг =>
 	//кКаким должен быть такой массив???
-
-	//Files* files = new Files;
-	//SetFiles(files);
-
-
-	//Files* files = new Files;
-	//get_files_data(files);
-	//DisplayFiles(files);
-	
-	//print("I like %d numbers", 10);
 
 	//Пользователь должен иметь возможность по своему желанию выполнять
 	//разные действия с картотекой => нужно такую возможность ему

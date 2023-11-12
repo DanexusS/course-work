@@ -1,86 +1,29 @@
-//#include <iostream>
-//#include <cstring>
-#include "input.h"
 #include "book.h"
-
+#include "input.h"
 #include "generics.h"
 
-//NOTE: archive
-
-// TODO: use custom strcmp
-int CompareByAuthor(Book* first, Book* second, int order)
+int CompareStrings(char** first, char** second)
 {
-	return strcmp(first->author, second->author) * order;
-}
-int CompareByTitle(Book* first, Book* second, int order)
-{
-	return strcmp(first->title, second->title) * order;
-}
-int CompareByYear(Book* first, Book* second, int order)
-{
-	if (first->year > second->year)
-		return order;
-	if (first->year < second->year)
-		return order;
-	return 0;
-}
-int CompareByPrice(Book* first, Book* second, int order)
-{
-	if (first->price > second->price)
-		return order;
-	if (first->price < second->price)
-		return order;
-	return 0;
-}
-int CompareByCategory(Book* first, Book* second, int order)
-{
-	if (first->category > second->category)
-		return order;
-	if (first->category < second->category)
-		return order;
-	return 0;
-}
-
-
-int CompareByMultiple(Book* first, Book* second, SortingData** sortingData, int size)
-{
-	for (int i = 0; i < size; i++)
+	while (*first == *second && *first != "\0" && *second != "\0")
 	{
-		int compareResult = COMPARISON_FUNCTION_STACK[sortingData[i]->field_id](first, second, sortingData[i]->order);
-		if (compareResult != 0)
-			return compareResult;
+		first++;
+		second++;
 	}
+
+	int difference = *first - *second;
+
+	if (difference < -1)
+		return -1;
+	if (difference > 1)
+		return 1;
 	return 0;
 }
 
-
-//int CompareByAll(Book* first, Book* second)
-//{
-//	int authorCompareResult = CompareByAuthor(first, second);
-//	if (authorCompareResult != 0)
-//		return authorCompareResult;
-//	int titleCompareResult = CompareByTitle(first, second);
-//	if (titleCompareResult != 0)
-//		return titleCompareResult;
-//	int yearCompareResult = CompareByYear(first, second);
-//	if (yearCompareResult != 0)
-//		return yearCompareResult;
-//	int priceCompareResult = CompareByPrice(first, second);
-//	if (priceCompareResult != 0)
-//		return priceCompareResult;
-//	int categoryCompareResult = CompareByCategory(first, second);
-//	if (categoryCompareResult != 0)
-//		return categoryCompareResult;
-//	return 0;
-//}
-
-
-//int CompareBooks(int (*compare_func)(Book*, Book*), Book* first, Book* second)
-//{
-//	return compare_func(first, second);
-//}
-
-//int (*FIELD_COMPARE_FUNCTION_STACK[])(Book*, Book*) = {};
+int CompareByAuthor(Book* first_book, Book* second_book, int order) { return order * CompareStrings(&first_book->author, &second_book->author); }
+int CompareByTitle(Book* first_book, Book* second_book, int order) { return order * CompareStrings(&first_book->title, &second_book->title); }
+int CompareByYear(Book* first_book, Book* second_book, int order) { return (first_book->year == second_book->year) ? 0 : order; }
+int CompareByPrice(Book* first_book, Book* second_book, int order) { return (first_book->price == second_book->price) ? 0 : order; }
+int CompareByCategory(Book* first_book, Book* second_book, int order) { return (first_book->category == second_book->category) ? 0 : order; }
 
 bool CheckIsNumber(char* input)
 {
@@ -103,14 +46,12 @@ bool CheckIsNumber(char* input)
 	return true;
 }
 
-// CONSTANTS
 const int CATEGORY_AMOUNT = (sizeof(categoryTitles) / sizeof(*categoryTitles));
 const int START_ITER_CHECK = 2;
 
-const PREDIFINED_COMMANDS PREDIFINED_BOOK_COMMANDS;
 const char* BACK_CHAR = "-";
 
-const char* PRINT_PROMPTS[BOOK_TEXT_FILD_SIZE] = { "Enter author: ", "Enter title: ", "Enter publish year: ", "Enter price: ", "Enter category number: " };
+const char* PRINT_PROMPTS[BOOK_STRUCT_FIELD_AMOUNT] = { "Enter author: ", "Enter title: ", "Enter publish year: ", "Enter price: ", "Enter category number: " };
 
 bool CheckYearValidity(char* year) { return !CheckIsNumber(year) || atoi(year) < 1056; }
 bool CheckPriceValidity(char* price) { return !CheckIsNumber(price) || atof(price) < 0; }
@@ -126,8 +67,8 @@ void PrintHelpInformation()
 	printf("How to use:\n");
 	printf(" The input is queued specificly in this order: (author -> title -> year -> price -> category\n");
 	printf(" To return to the previous queue position: type %s\n", BACK_CHAR);
-	printf(" To cancel entering book data: type %s\n", PREDIFINED_BOOK_COMMANDS.EXIT_CHAR);
-	printf(" To show this text again: type %s\n", PREDIFINED_BOOK_COMMANDS.HELP_CHAR);
+	printf(" To cancel entering book data: type %s\n", EXIT_CHAR);
+	printf(" To show this text again: type %s\n", HELP_CHAR);
 	printf(" NOTE: Category number and its name:\n");
 	for (int i = 0; i < CATEGORY_AMOUNT; i++)
 		printf(" %s: %d\n", categoryTitles[i], i);
@@ -156,12 +97,12 @@ ReturnResults WorkWithPrebuiltCommands(char* input, unsigned short& iter)
 
 		return SkipIteration;
 	}
-	if (strcmp(input, PREDIFINED_BOOK_COMMANDS.EXIT_CHAR) == 0)
+	if (strcmp(input, EXIT_CHAR) == 0)
 	{
 		printf("Exiting from getting book data module\n\n\n");
 		return ExitInput;
 	}
-	if (strcmp(input, PREDIFINED_BOOK_COMMANDS.HELP_CHAR) == 0)
+	if (strcmp(input, HELP_CHAR) == 0)
 	{
 		PrintHelpInformation();
 		return SkipIteration;
@@ -206,8 +147,7 @@ bool SetBookData(Book* book)
 	printf("\t\t\tGETTING BOOK DATA FROM INPUT\n\t\t\t----------------------------");
 	PrintHelpInformation();
 
-	char buffer[BOOK_TEXT_FILD_SIZE];
-	char* input = buffer;
+	char* input = new char[1000];
 	unsigned short queuePosition = 0;
 
 	while (queuePosition != BOOK_STRUCT_FIELD_AMOUNT)
@@ -238,5 +178,6 @@ bool SetBookData(Book* book)
 		queuePosition++;
 	}
 
+	delete[] input;
 	return true;
 }

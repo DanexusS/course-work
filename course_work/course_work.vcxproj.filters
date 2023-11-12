@@ -21,7 +21,7 @@
     <ClCompile Include="book.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="files.cpp">
+    <ClCompile Include="library.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,7 +35,7 @@
     <ClInclude Include="output.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="files.h">
+    <ClInclude Include="library.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generics.h">

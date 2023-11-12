@@ -1,8 +1,9 @@
 #pragma once
 #include <cstdio>
 #include <iostream>
-#include "files.h"
+
 #include "book.h"
+#include "library.h"
 
 static void scan(char* input)
 {
@@ -10,8 +11,7 @@ static void scan(char* input)
 	getchar();
 }
 
-
-static void get_book_data(Files* files, char* location)
+static void GetBookData(Library* library, char* location)
 {
 	char* temp = new char[1000];
 	strcpy(temp, "data/");
@@ -25,39 +25,24 @@ static void get_book_data(Files* files, char* location)
 		return;
 	}
 		
-
-
 	Book* book = new Book;
-	//SetBook(book);
 	char buffer[1000];
 	char input_buffer[1000];
 	char* input_string = input_buffer;
 
 	for (int j = 0; j < BOOK_STRUCT_FIELD_AMOUNT; j++)
 	{
-
-
 		fscanf(book_file, "%[^\n]s\n", input_string);
-
 		INPUT_FUNCTION_STACK[j](book, input_string);
-
 		fgets(buffer, 2, book_file);
 	}
-
-	//files->books[i] = book;
-
-	AddBook(files, book);
-
-
-	//
-	//FILE* book = fopen(DATA_LOCATION + book_location, "r");
-	//printf(strcat(book_location, "data/"));
+	AddBook(library, book);
 
 	fclose(book_file);
 	delete[] temp;
 }
 
-static void get_files_data(Files* files)
+static void GetLibraryData(Library* library)
 {
 	unsigned int files_size = 0;
 	FILE* files_data = fopen("data/files_data.txt", "r");
@@ -68,17 +53,10 @@ static void get_files_data(Files* files)
 
 	fscanf(files_data, "%d\n", &files_size);
 
-	//files->size = files_size;
-	SetFiles(files, files_size);
-
-	char input_buffer[1000];
-	char* input_string = input_buffer;
+	SetLibrary(library, files_size);
 	
 	for (int i = 0; i < files_size; i++)
 	{
-
-
-
 		fscanf(files_data, "%[^\n]s\n", book_location);
 		
 #if defined _DEBUG
@@ -86,22 +64,9 @@ static void get_files_data(Files* files)
 		printf("\n");
 #endif
 
-		get_book_data(files, book_location);
+		GetBookData(library, book_location);
 
-		// Подсказка2: удобно в качестве первого данного в файле хранить количество
-		// книг в картотеке
-		//Если файл существует и его удалось открыть
-		//if()
-		//{
-		//Чтение данных из файла
-		//а) считали количество элементов
-		//б) создали массив требуемой размерности
-		//в) считали данные из файла в массив
-		//}
-
-		
 		fgets(buffer, 2, files_data);
-
 	}
 
 	fclose(files_data);
