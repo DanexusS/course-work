@@ -1,51 +1,10 @@
 #include "book.h"
 #include "input.h"
+#include "output.h"
 #include "generics.h"
 
-const int CATEGORY_AMOUNT = (sizeof(CATEGORY_TITLES) / sizeof(*CATEGORY_TITLES));
 const int START_ITER_CHECK = 2;
-
-const char* BACK_CHAR = "-";
 const char* PRINT_PROMPTS[BOOK_STRUCT_FIELD_AMOUNT] = { "Enter author: ", "Enter title: ", "Enter publish year: ", "Enter price: ", "Enter category number: " };
-
-int CompareStrings(char** first, char** second) {
-	while (*first == *second && *first != "\0" && *second != "\0") {
-		first++;
-		second++;
-	}
-
-	int difference = *first - *second;
-
-	if (difference < -1)
-		return -1;
-	if (difference > 1)
-		return 1;
-	return 0;
-}
-int CompareByAuthor(Book* first_book, Book* second_book) { return CompareStrings(&first_book->author, &second_book->author); }
-int CompareByTitle(Book* first_book, Book* second_book) { return CompareStrings(&first_book->title, &second_book->title); }
-
-int CompareByYear(Book* first_book, Book* second_book) { 
-	if (first_book->year > second_book->year)
-		return 1;
-	if (first_book->year < second_book->year)
-		return -1;
-	return 0; 
-}
-int CompareByPrice(Book* first_book, Book* second_book) { 
-	if (first_book->price > second_book->price)
-		return 1;
-	if (first_book->price < second_book->price)
-		return -1;
-	return 0;
-}
-int CompareByCategory(Book* first_book, Book* second_book) {
-	if (first_book->category > second_book->category)
-		return 1;
-	if (first_book->category < second_book->category)
-		return -1;
-	return 0;
-}
 
 bool CheckIsNumber(char* input) {
 	int i = 0;
@@ -69,23 +28,6 @@ bool CheckYearValidity(char* year) { return !CheckIsNumber(year) || atoi(year) <
 bool CheckPriceValidity(char* price) { return !CheckIsNumber(price) || atof(price) < 0; }
 bool CheckCategoryValidity(char* category) { return !CheckIsNumber(category) || (atoi(category) < 0 || atoi(category) > CATEGORY_AMOUNT - 1); }
 
-void PrintYearText(char* input) { printf("There were no existing book published in %s year.", input); }
-void PrintPriceText(char* input) { printf("The '%s$' is not valid price.", input); }
-void PrintCategoryText(char* input) { printf("The category under %s number is not found. Acceptable numbers from 0 to %d.", input, CATEGORY_AMOUNT - 1); }
-
-void PrintHelpInformation() {
-	printf("\n\n");
-	printf("How to use:\n");
-	printf(" The input is queued specificly in this order: (author -> title -> year -> price -> category\n");
-	printf(" To return to the previous queue position: type %s\n", BACK_CHAR);
-	printf(" To cancel entering book data: type %s\n", EXIT_CHAR);
-	printf(" To show this text again: type %s\n", HELP_CHAR);
-	printf(" NOTE: Category number and its name:\n");
-	for (int i = 0; i < CATEGORY_AMOUNT; i++)
-		printf(" %s: %d\n", CATEGORY_TITLES[i], i);
-	printf("\n");
-}
-
 static enum ReturnResults {
 	ExitInput,
 	SkipIteration,
@@ -93,7 +35,9 @@ static enum ReturnResults {
 };
 
 ReturnResults WorkWithPrebuiltCommands(char* input, unsigned short& iter) {
-	if (strcmp(input, BACK_CHAR) == 0) {
+	switch (*input)
+	{
+	case BACK_CHAR: {
 		if (iter == 0)
 			printf("   You are at the begining of the input queue, no need to go back.\n\n");
 		else {
@@ -104,19 +48,20 @@ ReturnResults WorkWithPrebuiltCommands(char* input, unsigned short& iter) {
 
 		return SkipIteration;
 	}
-	if (strcmp(input, &EXIT_CHAR) == 0) {
+	case EXIT_CHAR:
 		printf("Exiting from getting book data module\n\n\n");
 		return ExitInput;
-	}
-	if (strcmp(input, &HELP_CHAR) == 0) {
-		PrintHelpInformation();
+	case HELP_CHAR:
+		DisplayBookInputHelpMessage();
 		return SkipIteration;
+	default:
+		break;
 	}
 
 	return ContinueCurrentIteration;
 }
 
-short CheckValidity(char* input, unsigned short& queuePosition, bool (*ifstatement)(char*), void (*print)(char*))
+int CheckValidity(char* input, unsigned short& queuePosition, bool (*ifstatement)(char*), void (*print)(char*))
 {
 	bool wentBack = false;
 
@@ -125,13 +70,13 @@ short CheckValidity(char* input, unsigned short& queuePosition, bool (*ifstateme
 		printf(" Enter valid input, go back, or exit: ");
 		scan_line(input);
 
-		short workWithPrebuiltCommandsResult = WorkWithPrebuiltCommands(input, queuePosition);
+		ReturnResults workWithPrebuiltCommandsResult = WorkWithPrebuiltCommands(input, queuePosition);
 
-		if (workWithPrebuiltCommandsResult == 0) {
+		if (workWithPrebuiltCommandsResult == SkipIteration) {
 			wentBack = true;
 			break;
 		}
-		else if (workWithPrebuiltCommandsResult == -1)
+		else if (workWithPrebuiltCommandsResult == ExitInput)
 			return 0;
 	}
 	if (wentBack)
@@ -147,7 +92,7 @@ bool SetBookData(Book* book)
 {
 	printf("\n\n\n");
 	printf("\t\t\tGETTING BOOK DATA FROM INPUT\n\t\t\t----------------------------");
-	PrintHelpInformation();
+	DisplayBookInputHelpMessage();
 
 	char* input = new char[1000];
 	unsigned short queuePosition = 0;

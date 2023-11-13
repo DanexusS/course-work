@@ -134,7 +134,10 @@
   <ItemGroup>
     <ClCompile Include="book.cpp" />
     <ClCompile Include="course_work.cpp" />
+    <ClCompile Include="input.cpp" />
     <ClCompile Include="library.cpp" />
+    <ClCompile Include="output.cpp" />
+    <ClCompile Include="sort.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="book.h" />
@@ -142,6 +145,7 @@
     <ClInclude Include="library.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="output.h" />
+    <ClInclude Include="sort.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

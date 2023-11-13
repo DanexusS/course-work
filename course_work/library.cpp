@@ -1,4 +1,5 @@
 #include "book.h"
+#include "sort.h"
 #include "input.h"
 #include "output.h"
 #include "library.h"
@@ -7,150 +8,191 @@
 int (*COMPARISON_FUNCTION_STACK[])(Book*, Book*) = { CompareByAuthor, CompareByTitle, CompareByYear, CompareByPrice, CompareByCategory };
 
 void AddBook(Library* library, Book* book) {
-	Book** newArray = new Book * [library->size + 1];
+	if (library->size + 1 >= library->free_space) {
+		library->free_space *= 2;
+		Book** newArray = new Book*[library->free_space];
 
-	for (int i = 0; i < library->size; i++)
-		newArray[i] = library->books[i];
-	newArray[library->size] = book;
+		for (int i = 0; i < library->size; i++)
+			newArray[i] = library->books[i];
+		book->_id = library->size;
+		newArray[library->size] = book;
 
-	delete[] library->books;
-	library->books = newArray;
-	library->size++;
-}
-
-Book** SortBooks(Library* library, int (*Compare)(Book*, Book*), int order) {
-	Book** sorted_books = library->books;
-
-	for (int i = 0; i < library->size - 1; i++) {
-		bool b = false;
-		for (int j = 0; j < library->size - i - 1; j++) {
-			Book* curBook = sorted_books[j];
-			Book* nextBook = sorted_books[j + 1];
-			if (order * (*Compare)(curBook, nextBook) > 0) {
-				Book* temp = curBook;
-
-				sorted_books[j] = nextBook;
-				sorted_books[j + 1] = temp;
-
-				b = true;
-			}
-		}
-		if (!b)
-			break;
+		delete[] library->books;
+		library->books = newArray;
+		library->size++;
+		return;
 	}
 
-	return sorted_books;
+	book->_id = library->size;
+	library->books[library->size] = book;
+	library->size++;
 }
 
 void RemoveBook(Library* library, int _id) {
 	_id--;
-	//_id check
 
-	Book** newArray = new Book * [library->size - 1];
+	if (_id < 0 || _id > library->size) {
+		DisplayErrorMessage("Entered id is not in the library");
+		return;
+	}
 
-	DeleteBook(library->books[_id]);
+	if (library->size - 1 < library->free_space / 2) library->free_space /= 2;
 
 	int old_array_id = 0;
+	Book** newArray = new Book*[library->free_space];
+
 	for (int i = 0; i < library->size - 1; i++) {
 		if (_id == old_array_id)
 			old_array_id++;
 
+		library->books[old_array_id]->_id = old_array_id;
 		newArray[i] = library->books[old_array_id];
 		old_array_id++;
 		if (old_array_id == library->size)
 			break;
 	}
 
+	DeleteBook(library->books[_id]);
 	delete[] library->books;
+
 	library->books = newArray;
 	library->size--;
 }
 
-void RemoveBooks(Library* library, int min, int max) {
-	//check min and max
+bool RemoveBooks(Library* library, int min, int max) {
+	if (min < 0 || max > library->size || min > max) {
+		DisplayErrorMessage("Entered input range is not corrected.");
+		return false;
+	}
 
-	Book** newArray = new Book * [library->size - max + min - 1];
+	int delete_size = max - min + 1;
+
+	if (library->size - delete_size < library->free_space / 2)
+		while (library->size - delete_size < library->free_space - 1)
+			library->free_space /= 2;
+
 	int old_array_id = 0;
+	Book** newArray = new Book*[library->free_space];
 
+	int new_id = 0;
 	for (int _id = 0; _id < library->size; _id++) {
 		if (_id >= min - 1 && _id < max) {
 			DeleteBook(library->books[_id]);
+			
 			old_array_id++;
 			continue;
 		}
 
-		newArray[_id] = library->books[old_array_id];
+		library->books[old_array_id]->_id = new_id;
+		newArray[new_id] = library->books[old_array_id];
 		old_array_id++;
+		new_id++;
 	}
 
 	delete[] library->books;
+
 	library->books = newArray;
-	library->size -= max - min + 1;
+	library->size -= delete_size;
+
+	return true;
 }
 
 void DisplayLibraryCommand(Library* library, char* input) {
+	DisplayLibraryCommandText();
+
 	scan_char(input);
 	
-	switch (*input)
-	{
-	case '1':
-		DisplayLibrary(library);
-		break;
-	case '2': {
-		char second_input = DEFAULT_CHAR;
+	while (true) {
+		switch (*input)
+		{
+		case '1':
+			printf("Displaying library's books normally:\n");
+			DisplayLibrary(library);
+			return;
+		case '2': {
+			char second_input = DEFAULT_CHAR;
 
-		// choose field to sort
-		printf("sorted display");
-		scan_char(input);
-		scan_char(&second_input);
+			DisplaySortedBookDisplayText();
 
-		Book** sorted_books = SortBooks(
-			library,
-			COMPARISON_FUNCTION_STACK[atoi(input)],
-			((atoi(&second_input) == 1) ? -1 : 1)
-		);
+			printf("Enter field's number: ");
+			scan_char(input);
+			if (atoi(input) < 0 || atoi(input) > 4) DisplayErrorMessage("Incorrect field's number!");
+			printf("\n");
 
-		DisplayBookList(sorted_books, library->size);
-		break;
-	}
-	default:
-		break;
+			printf("Enter order's number: ");
+			scan_char(&second_input);
+			if (atoi(&second_input) < 0 || atoi(&second_input) > 1) DisplayErrorMessage("Incorrect order's number!");
+			printf("\n");
+
+			Book** sorted_books = SortBooks(
+				library,
+				COMPARISON_FUNCTION_STACK[atoi(input)],
+				((atoi(&second_input) == 1) ? -1 : 1)
+			);
+
+			DisplayBookList(sorted_books, library->size);
+			return;
+		}
+		default:
+			DisplayErrorMessage("There is no any other availible command number, except listed higher.");
+			break;
+		}
 	}
 }
 
-void RemoveBookCommand(Library* library, char* input) {
-	//display files
-	//choose mode
-	printf("delete char\n");
-	scan_char(input);
+void RemoveBookCommand(Library* library, char* input, char* long_input) {
+	RemoveBooksCommandText();
+	DisplayLibrary(library);
 
-	if (strcmp(input, "1") == 0) {
-		//enter book #
-		scan_char(input);
-		RemoveBook(library, atoi(input));
-	}
-	else if (strcmp(input, "2") == 0) {
-		char second_input = DEFAULT_CHAR;
-		
-		//enter min and max book id
-		scan_char(input);
-		scan_char(&second_input);
-		RemoveBooks(library, atoi(input), atoi(&second_input));
-	}
-	else {
-		// error
+	printf("\n\n\n");
+	printf("Choose removal type: ");
+	scan_char(input);
+	printf("\n");
+
+	while (true) {
+		switch (*input)
+		{
+		case '1':
+			printf("Enter book's id (from 1 to %d): ", library->size + 1);
+			scan_line(long_input);
+			printf("\n");
+
+			RemoveBook(library, atoi(input));
+			return;
+		case '2': {
+			char* second_long_input = new char[100];
+
+			printf("Enter id to start deleting from: ");
+			scan_line(long_input);
+			printf("\n");
+
+			printf("Enter id to end deleting to: ");
+			scan_char(second_long_input);
+			printf("\n");
+
+			RemoveBooks(library, atoi(long_input), atoi(second_long_input));
+
+			delete[] second_long_input;
+			return;
+		}
+		case EXIT_CHAR:
+			printf("Returning to the main menu.\n");
+			return;
+		default:
+			DisplayErrorMessage("There is no any other availible removal type's number, except listed higher.");
+			break;
+		}
 	}
 }
 
 void WorkWithLibrary() {
-	//print init
-	//print help func
 	char input = DEFAULT_CHAR;
-	char* input_string = new char[1000];
+	char* long_input = new char[1000];
 	Library* library = new Library;
 
 	GetLibraryData(library);
-	//msg done -> help how to
+
+	PrintProgramBegining();
 	
 	while (input != EXIT_CHAR) {
 		scan_char(&input);
@@ -164,33 +206,62 @@ void WorkWithLibrary() {
 			Book* book = new Book;
 
 			if (SetBookData(book)) {
+				printf(" Book was initialized, so the book is added into the library.\n");
 				AddBook(library, book);
 			}
 			else {
+				printf(" Book wasn't fully initialized, so the book won't be added into the library.\n");
 				delete book;
 			}
 			break;
 		}
 		case '3':
-			RemoveBookCommand(library, &input);
+			RemoveBookCommand(library, &input, long_input);
 			break;
 		case '4':
+			DisplayExportLibraryDataCommandText();
 			ExportLibraryData(library);
 			break;
-		case '5':
-			scan_line(input_string);
-			GetBookData(library, input_string);
-			break;
-		case HELP_CHAR:
-			break;
-		case EXIT_CHAR:
-			break;
-		default:
+		case '5': {
+			scan_line(long_input);
+			GetBookData(library, long_input);
 			break;
 		}
+		case '6': {
+			int category_count = 0;
+
+			scan_char(&input);
+
+			if (atoi(&input) < 0 || atoi(&input) > CATEGORY_AMOUNT) {
+				DisplayErrorMessage("Entered category id is not valid");
+				break;
+			}
+
+			for (int _id = 0; _id < library->size; _id++)
+				if ((int)library->books[_id]->category == atoi(&input))
+					category_count++;
+
+			printf("%d\n", category_count);
+			break;
+		}
+		case HELP_CHAR:
+			DisplayLibraryHelpMessage();
+			break;
+		case EXIT_CHAR:
+			printf("\n\n\n");
+			printf("Exiting the program, goodbye for now!\n");
+			break;
+		case CLEAR_CHAR:
+			system("cls");
+			break;
+		default:
+			DisplayErrorMessage("This command is not supported by this program!");
+			break;
+		}
+		if (input != EXIT_CHAR) DisplayLibraryHelpMessage();
 	}
 
 	DeleteLibrary(library);
 
-	delete[] input_string;
+	delete[] long_input;
 }

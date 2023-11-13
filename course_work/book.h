@@ -1,8 +1,11 @@
 #pragma once
 #include <iostream>
 
-static const int BOOK_STRUCT_FIELD_AMOUNT = 5;
+static const char BACK_CHAR = '-';
 static const char* CATEGORY_TITLES[5] = { "Educational", "Popular-Scientific", "Scientific", "Reference", "Artistic" };
+
+static const int BOOK_STRUCT_FIELD_AMOUNT = 5;
+static const int CATEGORY_AMOUNT = (sizeof(CATEGORY_TITLES) / sizeof(*CATEGORY_TITLES));
 
 static enum Category {
 	Educational,
@@ -13,6 +16,7 @@ static enum Category {
 };
 
 struct Book {
+	int _id;
 	char* author;
 	char* title;
 	unsigned short year;
@@ -39,12 +43,5 @@ static void DeleteBook(Book* book) {
 }
 
 bool SetBookData(Book*);
-
-int CompareBooks(Book*, Book*);
-int CompareByAuthor(Book*, Book*);
-int CompareByTitle(Book*, Book*);
-int CompareByYear(Book*, Book*);
-int CompareByPrice(Book*, Book*);
-int CompareByCategory(Book*, Book*);
 
 static void(*INPUT_FUNCTION_STACK[])(Book*, char*) = { SetAuthor, SetTitle, SetYear, SetPrice, SetCategory };
