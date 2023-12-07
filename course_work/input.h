@@ -4,22 +4,29 @@
 
 #include "book.h"
 #include "library.h"
+#include "generics.h"
 
-struct Logo {
-	char** picture;
-	int height;
-};
+bool CheckFolderLocation(const char* folder_location);
+bool CheckFileLocation(const char* file_location);
 
-static void DeleteLogo(Logo* logo) {
-	for (int i = 0; i < logo->height; i++)
-		delete[] logo->picture[i];
-	delete[] logo->picture;
-	delete logo;
-}
+void scan_line(char* long_input);
+void scan_infinitely(
+	char* long_input,
+	const char* input_msg,
+	bool (*error_condition)(const char*),
+	const char* error_msg,
+	const char* before_modifier = "",
+	const char* after_modifier = ""
+);
+void scan_infinitely(
+	Library* library,
+	char* long_input,
+	const char* input_msg,
+	bool (*error_condition)(Library*, const char*),
+	const char* error_msg
+);
 
-void scan_char(char* input);
-void scan_line(char* input);
-
-Logo* GetLogoData();
+Picture* GetLogoData();
 void GetBookData(Library* library, char* location);
+void GetBookDataFull(Library* library, char* location);
 void GetLibraryData(Library* library);

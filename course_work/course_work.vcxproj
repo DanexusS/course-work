@@ -134,6 +134,7 @@
   <ItemGroup>
     <ClCompile Include="book.cpp" />
     <ClCompile Include="course_work.cpp" />
+    <ClCompile Include="generics.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="library.cpp" />
     <ClCompile Include="output.cpp" />

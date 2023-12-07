@@ -26,7 +26,7 @@ bool CheckIsNumber(char* input) {
 }
 bool CheckYearValidity(char* year) { return !CheckIsNumber(year) || atoi(year) < 1056; }
 bool CheckPriceValidity(char* price) { return !CheckIsNumber(price) || atof(price) < 0; }
-bool CheckCategoryValidity(char* category) { return !CheckIsNumber(category) || (atoi(category) < 0 || atoi(category) > CATEGORY_AMOUNT - 1); }
+bool CheckCategoryValidity(char* category) { return !CheckIsNumber(category) || (atoi(category) < 0 || atoi(category) > BOOK_CATEGORY_AMOUNT); }
 
 static enum ReturnResults {
 	ExitInput,
@@ -35,6 +35,9 @@ static enum ReturnResults {
 };
 
 ReturnResults WorkWithPrebuiltCommands(char* input, unsigned short& iter) {
+	if (strlen(input) > 1)
+		return ContinueCurrentIteration;
+
 	switch (*input)
 	{
 	case BACK_CHAR: {
@@ -57,15 +60,12 @@ ReturnResults WorkWithPrebuiltCommands(char* input, unsigned short& iter) {
 	default:
 		break;
 	}
-
-	return ContinueCurrentIteration;
 }
 
-int CheckValidity(char* input, unsigned short& queuePosition, bool (*ifstatement)(char*), void (*print)(char*))
-{
+int CheckValidity(char* input, unsigned short& queuePosition, bool (*condition)(char*), void (*print)(char*)) {
 	bool wentBack = false;
 
-	while (ifstatement(input)) {
+	while (condition(input)) {
 		print(input);
 		printf(" Enter valid input, go back, or exit: ");
 		scan_line(input);
@@ -88,20 +88,18 @@ int CheckValidity(char* input, unsigned short& queuePosition, bool (*ifstatement
 void(*PRINT_FUNCTION_STACK[])(char*) = { PrintYearText, PrintPriceText, PrintCategoryText };
 bool(*CHECK_FUNCTION_STACK[])(char*) = { CheckYearValidity, CheckPriceValidity, CheckCategoryValidity };
 
-bool SetBookData(Book* book)
-{
-	printf("\n\n\n");
+bool SetBookData(Book* book, char* long_input) {
+	printf("\n\n");
 	printf("\t\t\tGETTING BOOK DATA FROM INPUT\n\t\t\t----------------------------");
 	DisplayBookInputHelpMessage();
 
-	char* input = new char[1000];
 	unsigned short queuePosition = 0;
 
 	while (queuePosition != BOOK_STRUCT_FIELD_AMOUNT) {
 		printf(PRINT_PROMPTS[queuePosition]);
-		scan_line(input);
+		scan_line(long_input);
 
-		short prebuiltCommandsResult = WorkWithPrebuiltCommands(input, queuePosition);
+		short prebuiltCommandsResult = WorkWithPrebuiltCommands(long_input, queuePosition);
 
 		if (prebuiltCommandsResult == SkipIteration)
 			continue;
@@ -110,7 +108,10 @@ bool SetBookData(Book* book)
 
 		if (queuePosition >= START_ITER_CHECK) {
 			int validityCheckResult = CheckValidity(
-				input, queuePosition, CHECK_FUNCTION_STACK[queuePosition - START_ITER_CHECK], PRINT_FUNCTION_STACK[queuePosition - START_ITER_CHECK]
+				long_input, 
+				queuePosition, 
+				CHECK_FUNCTION_STACK[queuePosition - START_ITER_CHECK], 
+				PRINT_FUNCTION_STACK[queuePosition - START_ITER_CHECK]
 			);
 
 			if (validityCheckResult == 0)
@@ -119,10 +120,9 @@ bool SetBookData(Book* book)
 				continue;
 		}
 
-		INPUT_FUNCTION_STACK[queuePosition](book, input);
+		INPUT_FUNCTION_STACK[queuePosition](book, long_input);
 		queuePosition++;
 	}
 
-	delete[] input;
 	return true;
 }
